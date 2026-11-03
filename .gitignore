@@ -1,0 +1,7 @@
+node_modules/
+data.json
+.DS_Store
+_studio/out/
+_studio/rec-profile-*/
+_studio/pyre-frames/
+_studio/rec-frames-*/

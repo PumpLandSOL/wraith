@@ -1,0 +1,44 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WRAITH · sealed statement</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;600&family=Martian+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{--bone:#07050b;--paper:#0d0a14;--ink:#efe9fb;--mut:#9a91ae;--hair:rgba(196,161,255,.12);--acid:#9945ff;--red:#d78bff;--mono:'Martian Mono',ui-monospace,monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--bone);color:var(--ink);font:400 16px/1.55 'Hanken Grotesk',system-ui,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:40px 18px 80px}
+.eye{font:600 11px var(--mono);letter-spacing:.18em;text-transform:uppercase;background:rgba(153,69,255,.08);border:1px solid rgba(153,69,255,.5);color:#c4a1ff;border-radius:99px;display:inline-block;padding:5px 9px}
+h1{font:400 clamp(48px,8vw,92px)/.92 'Instrument Serif',serif;letter-spacing:-.02em;margin:18px 0 12px}h1 span{font-style:italic;color:#c4a1ff;text-shadow:0 0 40px rgba(153,69,255,.35)}
+.sub{color:var(--mut);margin-bottom:24px;max-width:640px}
+.card{background:var(--paper);border:1px solid var(--hair);border-radius:22px;padding:24px 26px}
+.kv{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px dashed var(--hair);font:400 13px var(--mono)}.kv span{color:var(--mut);text-transform:uppercase;letter-spacing:.1em;font-size:11px}.kv b{font-weight:500;text-align:right;word-break:break-all}
+.big{font:400 42px 'Instrument Serif',serif;color:#c4a1ff}
+table{width:100%;border-collapse:collapse}th{font:600 10px var(--mono);letter-spacing:.16em;color:var(--mut);text-transform:uppercase;text-align:left;padding:8px 6px;border-bottom:1px solid var(--hair)}
+td{padding:9px 6px;border-bottom:1px solid var(--hair);font:400 13px var(--mono)}td.am{text-align:right}
+.ty{display:inline-block;font:600 10px var(--mono);letter-spacing:.12em;padding:2px 8px;border:1px solid var(--hair);border-radius:99px;text-transform:uppercase}
+.ty.claimed,.ty.received,.ty.deposit{background:var(--acid);color:#fff}.ty.note,.ty.sent{color:#c4a1ff;border-color:rgba(153,69,255,.5)}
+.seal{font:600 11px var(--mono);letter-spacing:.16em;border-radius:99px;background:var(--acid);color:#fff;padding:6px 12px;display:inline-block;margin-bottom:14px}
+.err{color:var(--red);font:600 14px var(--mono)}.foot{margin-top:28px;font-size:14px;color:var(--mut)}a{color:var(--ink)}
+h3{font:600 11px var(--mono);letter-spacing:.18em;text-transform:uppercase;margin:24px 0 8px}
+</style></head><body><div class="wrap">
+  <div class="eye">WRAITH · the seal · read-only</div>
+  <h1>What the key <span>holder sees.</span></h1>
+  <div class="sub">This page was opened with a view key. It reads this wallet's shielded balance and history. It can never spend.</div>
+  <div id="out" class="card">reading the seal…</div>
+  <div class="foot">Selective disclosure: the wallet owner made this key on <a href="/">WRAITH</a> and chose who to give it to. Nobody without it can see any of this. Balances are ledger balances at the time of reading.</div>
+</div>
+<script>
+const $ = (s) => document.querySelector(s); const fmt = (n) => (+n).toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+(async () => {
+  const key = (location.hash || '').replace(/^#/, '').trim(); if (!key) { $('#out').innerHTML = '<span class="err">no view key in the link</span>'; return; }
+  const r = await fetch('/api/view', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ key }) }).then((x) => x.json());
+  if (r.error) { $('#out').innerHTML = '<span class="err">' + r.error + '</span>'; return; }
+  const rows = (r.hist || []).map((h) => `<tr><td><span class="ty ${h.type}">${h.type}</span></td><td>${new Date(h.ts).toISOString().replace('T', ' ').slice(0, 16)} UTC</td><td>${h.memo ? h.memo : h.to ? h.to.slice(0, 6) + '…' + h.to.slice(-4) : h.id ? 'note ' + h.id.slice(0, 8) + '…' : ''}</td><td class="am">${fmt(h.amt)} ${h.type === 'deposit' ? 'USDC' : 'wUSD'}</td></tr>`).join('') || '<tr><td colspan="4" style="color:var(--mut)">no shielded activity yet</td></tr>';
+  $('#out').innerHTML = `<div class="seal">✓ Seal verified · HMAC-SHA256</div>
+    <div class="kv"><span>wallet</span><b>${r.wallet}</b></div>
+    <div class="kv"><span>shielded balance</span><b class="big">${fmt(r.priv)} wUSD</b></div>
+    <div class="kv"><span>staked in the vigil</span><b>${fmt(r.staked)} wUSD</b></div>
+    <div class="kv"><span>ledger merkle root</span><b>${r.root}</b></div>
+    <div class="kv"><span>read at</span><b>${new Date(r.t).toISOString()}</b></div>
+    <h3>Shielded history</h3>
+    <div style="overflow-x:auto"><table><tr><th>type</th><th>when</th><th>detail</th><th style="text-align:right">amount</th></tr>${rows}</table></div>`;
+})();
+</script></body></html>
