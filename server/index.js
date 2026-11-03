@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 8270;
 const ROOT = path.join(__dirname, '..');
 const DATA_PATH = process.env.DATA_PATH || path.join(ROOT, 'data.json');
 const STABLE = 'wUSD', GOV = 'WRAITH';
-const WRAITH_MINT = process.env.WRAITH_MINT || '';   // $WRAITH SPL mint: the CA bar, price feed and burns light up when set
+const WRAITH_MINT = process.env.WRAITH_MINT || 'TQWwqEcm5LERR7p2NmJbieneL4gPt9NjNt238xApump';   // $WRAITH SPL mint: the CA bar, price feed and burns light up when set
 const TREASURY = process.env.TREASURY || '';         // Solana wallet that receives USDC. Environment only: never in the repo, never returned by an API.
 const TICK_SEC = +(process.env.TICK_SEC || 5);
 const SEED = { usdc: 0, wraith: 0, wusd: 0, priv: 0 };   // real deposits only — nothing is seeded
