@@ -6,7 +6,7 @@
 - **$WRAITH** is the share token. Every mint, toll and dark-pool fee buys it at market and burns it.
 - **Shield** wUSD and your balance becomes a commitment in one Merkle tree. A **private send** spends a note and writes a new one: the ledger records a nullifier and a commitment, never the amount, the sender or the receiver.
 
-Live at [wraithnetwork.org](https://wraithnetwork.org).
+Live at [wraithnetwork.net](https://wraithnetwork.net).
 
 ## What runs today
 
